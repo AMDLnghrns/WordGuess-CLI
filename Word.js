@@ -5,7 +5,8 @@ var Letter = require("./Letter");
 
 var characters = ["mountains"]; //, 'rocky', 'zion', 'glacier','wind cave', 'denali','biscayne','kenai fjords','basin','isle', 'lake'];
 var selectedWord = characters[Math.floor(Math.random() * characters.length)].split("");
-var guessedLetters = ["m", "n", "t", "a", "i"];
+// var guessedLetters = ["m", "n", "t", "a", "i"];
+var guessedLetters = [];
 
 var output = [];
 
@@ -34,7 +35,7 @@ var Word = function(selectedWord,guessedLetters,output) {
 //     })
 // }
 // console.log(new Word(selectedWord, guessedLetters));
-// console.log(new Word(selectedWord, guessedLetters,output).stringIt);
+console.log(new Word(selectedWord, guessedLetters,output).stringIt);
 
 // exporting our Word constructor
 module.exports = Word;
