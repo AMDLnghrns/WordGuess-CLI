@@ -24,51 +24,14 @@ for (var i = 0; i < selectedWord.length; i++) {
 
 // console.log(new Word(selectedWord, guessedLetters,output));
 
-// var hangman = function () {
-// inquirer
-//   .prompt([
-//     {
-//       type: "input",
-//       message: "Guess a letter",
-//       name: "guessedLetter"
-//     }
-//   ])
-//   .then(function(inquirerResponse) {
-//     console.log(inquirerResponse.guessedLetter);
-//     if (selectedWord.includes(inquirerResponse.guessedLetter)) {
-//       console.log("Y");
-//       correctGuess();
-//     } else {
-//       console.log("N");
-//       incorrectGuess();
-//     }
-
-//     //functions!!!
-//     function start() {
-//       guessesLeft = 10;
-//       guessedLetters = [];
-//     }
 
 //     function win() {
 //       guessesLeft = 10;
 //       guessedLetters = [];
 //     }
 
-//     function loss() {
-//       guessesLeft = 10;
-//       guessedLetters = [];
-//     }
 
-//     function correctGuess() {
-//       guessedLetters.push(inquirerResponse.guessedLetter);
-//     }
 
-//     function incorrectGuess() {
-//       guessesLeft--;
-//       guessedLetters.push(inquirerResponse.guessedLetter);
-//     }
-//   });
-// }
 
 var hangman = function() {
   if (guessesLeft > 0) {
@@ -120,30 +83,4 @@ var hangman = function() {
   }
 };
 hangman();
-//     inquirer
-//       .prompt([
-//         {
-//           type: "input",
-//           message: "Guess a letter!",
-//           name: "guessedLetter"
-//         }
-//       ])
-//       .then(function(inquirerResponse) {
-//         if (starters.length < 3) {
-//           starters.push(player);
-//           team.push(player);
-//           console.log(player.name + " added to the starters");
-//         } else {
-//           subs.push(player);
-//           team.push(player);
-//           console.log(player.name + " added to the subs");
-//         }
-//         hangman();
-//       });
-//   } else {
-//     for (var i = 0; i < team.length; i++) {
-//       team[i].printStats();
-//     }
 
-//   }
-// };
