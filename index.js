@@ -1,102 +1,121 @@
-// * **index.js**: The file containing the logic for the course of the game, which depends on `Word.js` and:
-// Randomly selects a word and uses the `Word` constructor to store it
-// Prompts the user for each guess and keeps track of the user's remaining guesses
-// `Letter.js` *should not* `require` any other files.
-// `Word.js` *should only* require `Letter.js`
-// **HINT:** Write `Letter.js` first and test it on its own before moving on, then do the same thing with `Word.js`
-// **HINT:** If you name your letter's display function `toString`, JavaScript will call that function automatically whenever casting that object to a string (check out this example: <https://jsbin.com/facawetume/edit?js,console>)
+const Word = require("./word.js");
+const inquirer = require("inquirer");
+const chalk = require("chalk");
 
-var Word = require("./Word"); // require word output
-//var Letter = require("./Letter"); // used for testing. remove when Word.js works
-var inquirer = require("inquirer"); // require inquirer
+var letterArray = "abcdefghijklmnopqrstuvwxyz";
+var characters = [
+  "mountains",
+  "rocky",
+  "zion",
+  "glacier",
+  "wind cave",
+  "denali",
+  "biscayne",
+  "kenai fjords",
+  "basin",
+  "isle",
+  "lake"
+];
+var randomWord = characters[Math.floor(Math.random() * characters.length)];
 
-var guessesLeft = 10; //guesses left at the beginning of the game
-var characters = ["mountains","rocky","zion","glacier","wind cave","denali","biscayne","kenai fjords","basin","isle","lake"]; // array of words to use
-var guessedLetters = []; // array of guessed letters
-var selectedWord = characters[Math.floor(Math.random() * characters.length)].split(""); //randomly selected word from characters list split up accordingly
+var computerWord = new Word(randomWord);
+var requireNewWord = false;
 
-//var output = ["m", "o", "u", "n", "t", "a", "i", "_", "s"]; // output used for testing. remove when word.js works
-var output = []; // output post testing
+var incorrectLetters = [];
+var correctLetters = [];
 
-///////////////// used for testing. should be in the word.js constructor
-// for (var i = 0; i < selectedWord.length; i++) {
-//   output.push(new Letter(selectedWord[i], guessedLetters).reveal());
-// }
-// console.log(new Word(selectedWord, guessedLetters,output));
-/////////////////
+var guessesLeft = 10;
 
-// // // // // hangman game in recursive function
-var hangman = function() {
-  if (guessesLeft > 0) {
+function hangman() {
+  if (requireNewWord) {
+    var randomIndex = Math.floor(Math.random() * characters.length);
+    var randomWord = characters[randomIndex];
+    computerWord = new Word(randomWord);
+    requireNewWord = false;
+  }
+  var wordComplete = [];
+  computerWord.objArray.forEach(completeCheck);
+  if (wordComplete.includes(false)) {
     inquirer
       .prompt([
         {
           type: "input",
-          message: "Guess a letter",
-          name: "guessedLetter"
+          message: "Guess a letter between A-Z!",
+          name: "userinput"
         }
       ])
-      .then(function(inquirerResponse) {
-        if (selectedWord.includes(inquirerResponse.guessedLetter)) {
-          console.log("CORRECT!!!");
-          console.log(output);
-          guessedLetters.push(inquirerResponse.guessedLetter);
-          console.log(guessedLetters);
+      .then(function(input) {
+        if (
+          !letterArray.includes(input.userinput) ||
+          input.userinput.length > 1
+        ) {
+          console.log("\nPlease try again!\n");
           hangman();
         } else {
-          guessesLeft--;
-          console.log("INCORRECT!!!");
-          console.log(output);
-          console.log(guessesLeft + " guesses remaining!");
-          guessedLetters.push(inquirerResponse.guessedLetter);
-          console.log(guessedLetters);
-          win();
-        }
-      });
-  } else {
-    console.log("You lost");
-    guessesLeft = 10;
-    guessedLetters = [];
-    inquirer
-      .prompt([
-        {
-          type: "list",
-          message: "Play Again?",
-          choices: ["Yes", "No"],
-          name: "playAgain"
-        }
-      ])
-      .then(function(inquirerResponse) {
-        if (inquirerResponse.playAgain === "Yes") {
-          hangman();
-        } else {
-          console.log("Come play again soon!");
-        }
-      });
-  }
-};
-hangman();
+          if (
+            incorrectLetters.includes(input.userinput) ||
+            correctLetters.includes(input.userinput) ||
+            input.userinput === ""
+          ) {
+            console.log("\nAlready Guessed or Nothing Entered\n");
+            hangman();
+          } else {
+            var wordCheckArray = [];
+            computerWord.userGuess(input.userinput);
+            computerWord.objArray.forEach(wordCheck);
+            if (wordCheckArray.join("") === wordComplete.join("")) {
+              console.log(chalk.red("\nIncorrect\n"));
+              incorrectLetters.push(input.userinput);
+              guessesLeft--;
+            } else {
+              console.log(chalk.green("\nCorrect!\n"));
+              correctLetters.push(input.userinput);
+            }
+            computerWord.log();
+            console.log("Guesses Left: " + guessesLeft + "\n");
 
-function win() {
-  if (output.indexOf("_") >= 0) {
-    hangman();
-  } else {
-    console.log("You Win!");
-    inquirer
-      .prompt([
-        {
-          type: "list",
-          message: "Play Again?",
-          choices: ["Yes", "No"],
-          name: "playAgain"
-        }
-      ])
-      .then(function(inquirerResponse) {
-        if (inquirerResponse.playAgain === "Yes") {
-          hangman();
-        } else {
-          console.log("Come play again soon!");
+            if (guessesLeft > 0) {
+              hangman();
+            } else {
+              console.log("Sorry, you lose!\n");
+              restartGame();
+            }
+            function wordCheck(key) {
+              wordCheckArray.push(key.guessed);
+            }
+          }
         }
       });
+  } else {
+    console.log("YOU WIN!\n");
+    restartGame();
+  }
+  function completeCheck(key) {
+    wordComplete.push(key.guessed);
   }
 }
+
+function restartGame() {
+  inquirer
+    .prompt([
+      {
+        type: "list",
+        message: "Would you like to play again?:",
+        choices: ["Yes", "No"],
+        name: "restart"
+      }
+    ])
+    .then(function(input) {
+      if (input.restart === "Yes") {
+        requireNewWord = true;
+        incorrectLetters = [];
+        correctLetters = [];
+        guessesLeft = 10;
+        hangman();
+      } else {
+        return;
+      }
+    });
+}
+
+hangman();
